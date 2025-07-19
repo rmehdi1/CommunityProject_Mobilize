@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Streamlit
+.streamlit/
+
+# Data files (if large)
+*.csv
+*.xlsx
+*.json
+data/raw/
+!streamlit_app/data/sample_data.csv
+
+# Model files (if large)
+streamlit_app/models/*.pkl
+streamlit_app/models/*.joblib
+!streamlit_app/models/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ignore this README template if you add your own
+README.md

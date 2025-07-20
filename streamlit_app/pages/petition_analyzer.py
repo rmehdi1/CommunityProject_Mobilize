@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,7 +7,6 @@ import re
 from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
-
 # Text processing imports
 try:
     import nltk
@@ -27,23 +27,19 @@ try:
         nltk.download('stopwords', quiet=True)
 except ImportError:
     st.error("NLTK not installed. Please install with: pip install nltk")
-
 try:
     from textstat import flesch_reading_ease, flesch_kincaid_grade, gunning_fog, automated_readability_index
 except ImportError:
     st.error("Textstat not installed. Please install with: pip install textstat")
-
 # ============================================================================
 # PAGE CONFIGURATION & STYLING
 # ============================================================================
-
 st.set_page_config(
-    page_title="🎯 Petition Success Predictor",
-    page_icon="🎯",
+    page_title="Petition Success Predictor",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
-
 # Custom CSS for beautiful styling
 st.markdown("""
 <style>
@@ -190,18 +186,14 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 # ============================================================================
 # PETITION PROCESSING PIPELINE
 # ============================================================================
-
 class StreamlitPetitionPipeline:
     """Streamlit-optimized petition processing pipeline"""
-
     def __init__(self):
         self.sia = SentimentIntensityAnalyzer() if 'nltk' in globals() else None
         self.setup_keywords()
-
     def setup_keywords(self):
         """Define keyword categories for analysis"""
         self.urgency_keywords = [
@@ -209,45 +201,38 @@ class StreamlitPetitionPipeline:
             'deadline', 'time running out', "before it's too late", 'last chance',
             'act now', 'breaking', 'critical', 'asap', 'quickly', 'rapidly', 'soon'
         ]
-
         self.action_keywords = [
             'stop', 'save', 'protect', 'demand', 'fight', 'defend', 'prevent',
             'ban', 'end', 'cancel', 'reverse', 'change', 'fix', 'solve',
             'help', 'support', 'join', 'sign', 'act', 'take action', 'make',
             'force', 'require', 'ensure', 'guarantee', 'implement', 'establish'
         ]
-
         self.power_words = [
             'justice', 'freedom', 'rights', 'equality', 'fair', 'unfair', 'wrong',
             'illegal', 'violation', 'abuse', 'corruption', 'scandal', 'outrage',
             'discrimination', 'injustice', 'betrayal', 'exploitation', 'oppression'
         ]
-
         self.authority_keywords = [
             'government', 'minister', 'ministry', 'department', 'authority', 'official',
             'court', 'judge', 'police', 'administration', 'commissioner', 'director',
             'secretary', 'chief', 'president', 'prime minister', 'governor', 'congress'
         ]
-
         self.cta_patterns = [
             r'\bsign\s+this\b', r'\bsign\s+now\b', r'\bjoin\s+us\b', r'\bhelp\s+us\b',
             r'\btake\s+action\b', r'\bact\s+now\b', r'\bmake\s+a\s+difference\b',
             r'\bdemand\s+action\b', r'\bstop\s+this\b', r'\bforce\s+them\b'
         ]
-
     def clean_html(self, text):
         """Remove HTML tags and clean text"""
         if pd.isna(text) or text is None:
             return ""
         clean = re.sub('<.*?>', '', str(text))
         return ' '.join(clean.split())
-
     def count_html_tags(self, text):
         """Count HTML tags in text"""
         if pd.isna(text) or text is None:
             return 0
         return len(re.findall('<.*?>', str(text)))
-
     def count_keywords(self, text, keywords):
         """Count keyword occurrences"""
         if pd.isna(text) or text is None:
@@ -257,14 +242,12 @@ class StreamlitPetitionPipeline:
         for keyword in keywords:
             count += clean_text.count(keyword.lower())
         return count
-
     def get_sentiment_scores(self, text):
         """Get sentiment scores"""
         if pd.isna(text) or text is None or not self.sia:
             return {'compound': 0, 'pos': 0, 'neg': 0, 'neu': 0}
         clean_text = self.clean_html(text)
         return self.sia.polarity_scores(clean_text)
-
     def calculate_readability(self, text):
         """Calculate readability metrics"""
         if pd.isna(text) or len(str(text).strip()) < 10:
@@ -273,9 +256,7 @@ class StreamlitPetitionPipeline:
                 'automated_readability': 0, 'avg_sentence_length': 0,
                 'avg_word_length': 0, 'vocab_diversity': 0, 'caps_ratio': 0
             }
-
         clean_text = self.clean_html(text)
-
         try:
             if 'textstat' in globals():
                 flesch_ease = flesch_reading_ease(clean_text)
@@ -286,7 +267,6 @@ class StreamlitPetitionPipeline:
                 flesch_ease = flesch_kincaid = gunning_fog_score = automated_readability = 0
         except:
             flesch_ease = flesch_kincaid = gunning_fog_score = automated_readability = 0
-
         # Additional metrics
         try:
             if 'nltk' in globals():
@@ -304,7 +284,6 @@ class StreamlitPetitionPipeline:
             caps_ratio = caps_words / len(words) if words else 0
         except:
             avg_sentence_length = avg_word_length = vocab_diversity = caps_ratio = 0
-
         return {
             'flesch_ease': flesch_ease,
             'flesch_kincaid': flesch_kincaid,
@@ -315,138 +294,108 @@ class StreamlitPetitionPipeline:
             'vocab_diversity': vocab_diversity,
             'caps_ratio': caps_ratio
         }
-
     def extract_features(self, petition_data):
         """Extract all features from petition data"""
         features = {}
         text_columns = ['title', 'description', 'letter_body', 'targeting_description']
-
         # Process each text column
         for col in text_columns:
             if col in petition_data:
                 text = petition_data[col]
-
                 # Basic text features
                 features[f'{col}_length'] = len(str(text)) if pd.notna(text) else 0
                 features[f'{col}_clean_length'] = len(self.clean_html(text))
                 features[f'{col}_word_count'] = len(self.clean_html(text).split()) if self.clean_html(text) else 0
-
                 # HTML features
                 if col == 'description':
                     features[f'{col}_html_tags'] = self.count_html_tags(text)
-
                 # Keyword counts
                 features[f'{col}_urgency_count'] = self.count_keywords(text, self.urgency_keywords)
                 features[f'{col}_action_count'] = self.count_keywords(text, self.action_keywords)
                 features[f'{col}_power_count'] = self.count_keywords(text, self.power_words)
                 features[f'{col}_authority_count'] = self.count_keywords(text, self.authority_keywords)
-
                 # Boolean keyword features
                 features[f'{col}_has_urgency'] = int(features[f'{col}_urgency_count'] > 0)
                 features[f'{col}_has_action'] = int(features[f'{col}_action_count'] > 0)
-
                 # CTA detection
                 cta_count = sum(len(re.findall(pattern, str(text).lower())) for pattern in self.cta_patterns) if pd.notna(text) else 0
                 features[f'{col}_cta_count'] = cta_count
                 features[f'{col}_has_cta'] = int(cta_count > 0)
-
                 # Numbers and statistics
                 features[f'{col}_numbers_count'] = len(re.findall(r'\d+', str(text))) if pd.notna(text) else 0
                 features[f'{col}_has_statistics'] = int(bool(re.search(r'\d+%|\d+\s*(percent|million|thousand|billion)', str(text), re.IGNORECASE)) if pd.notna(text) else False)
-
                 # Text structure
                 features[f'{col}_paragraph_count'] = len([p for p in str(text).split('\n') if p.strip()]) if pd.notna(text) else 0
                 features[f'{col}_question_count'] = str(text).count('?') if pd.notna(text) else 0
-
                 # Sentiment features
                 sentiment = self.get_sentiment_scores(text)
                 features[f'{col}_sentiment_compound'] = sentiment['compound']
                 features[f'{col}_sentiment_positive'] = sentiment['pos']
                 features[f'{col}_sentiment_negative'] = sentiment['neg']
                 features[f'{col}_emotional_intensity'] = sentiment['pos'] + sentiment['neg']
-
                 # Readability features
                 readability = self.calculate_readability(text)
                 for metric, value in readability.items():
                     features[f'{col}_{metric}'] = value
-
         # Strategic composite features
         features['content_comprehensiveness_score'] = (
             features.get('title_clean_length', 0) +
             features.get('description_clean_length', 0) +
             features.get('letter_body_clean_length', 0)
         )
-
         # Professional sophistication score
         desc_complexity = features.get('description_flesch_kincaid', 0)
         desc_length = features.get('description_clean_length', 0)
         html_formatting = features.get('description_html_tags', 0)
-
         title_complexity_norm = min(features.get('title_flesch_kincaid', 0) / 20, 1)
         desc_length_norm = min(desc_length / 2000, 1)
         html_tags_norm = min(html_formatting / 25, 1)
-
         features['professional_sophistication_score'] = (
             title_complexity_norm * 0.4 + desc_length_norm * 0.3 + html_tags_norm * 0.3
         )
-
         # Strategic urgency score
         urgency_total = features.get('title_urgency_count', 0) + features.get('description_urgency_count', 0)
         action_total = features.get('title_action_count', 0) + features.get('description_action_count', 0)
         sentiment_score = max(0, features.get('title_sentiment_compound', 0) + 1) / 2
-
         features['strategic_urgency_score'] = min((urgency_total + action_total) / 10 * 0.7 + sentiment_score * 0.3, 1)
-
         # Authority targeting score
         features['authority_targeting_score'] = (
             features.get('title_authority_count', 0) +
             features.get('description_authority_count', 0) +
             features.get('targeting_description_word_count', 0) / 10
         )
-
         # Message coherence score (simplified)
         features['message_coherence_score'] = 0.5
-
         return features
-
 # ============================================================================
 # MODEL LOADING FUNCTIONS
 # ============================================================================
-
 @st.cache_data
 def load_model_artifacts():
     """Load all model artifacts with caching"""
     artifacts = {}
-
     try:
         # Load trained model
         with open('models/best_model.pkl', 'rb') as f:
             artifacts['model'] = pickle.load(f)
-
         # Load feature names
         with open('models/model_features.pkl', 'rb') as f:
             artifacts['features'] = pickle.load(f)
-
         # Load categorical encoders
         with open('models/categorical_encoders.pkl', 'rb') as f:
             artifacts['encoders'] = pickle.load(f)
-
         # Try to load reference data
         try:
             artifacts['reference_data'] = pd.read_excel('data/processed_petition_data.xlsx')
         except FileNotFoundError:
             artifacts['reference_data'] = None
-
         return artifacts
-
     except FileNotFoundError as e:
         return None
-
 def predict_success(petition_data, model_artifacts, pipeline):
     """Predict petition success probability"""
     if not model_artifacts:
         return demo_prediction(petition_data, pipeline)
-
     try:
         features = pipeline.extract_features(petition_data)
         
@@ -454,25 +403,19 @@ def predict_success(petition_data, model_artifacts, pipeline):
         feature_vector = []
         for feature_name in model_artifacts['features']:
             feature_vector.append(features.get(feature_name, 0))
-
         # Make prediction
         feature_array = np.array(feature_vector).reshape(1, -1)
         probability = model_artifacts['model'].predict_proba(feature_array)[0, 1]
         prediction = model_artifacts['model'].predict(feature_array)[0]
-
         return probability, prediction, features
-
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
         return demo_prediction(petition_data, pipeline)
-
 def demo_prediction(petition_data, pipeline):
     """Demo prediction when model is not available"""
     features = pipeline.extract_features(petition_data)
-
     # Simple scoring system
     score = 0.0
-
     # Content length (40% weight)
     content_score = features.get('content_comprehensiveness_score', 0)
     if content_score >= 2000:
@@ -481,30 +424,23 @@ def demo_prediction(petition_data, pipeline):
         score += 0.25
     elif content_score >= 500:
         score += 0.15
-
     # HTML formatting (20% weight)
     html_tags = features.get('description_html_tags', 0)
     score += min(html_tags / 25, 1) * 0.20
-
     # Strategic language (25% weight)
     urgency_count = features.get('title_urgency_count', 0) + features.get('description_urgency_count', 0)
     action_count = features.get('title_action_count', 0) + features.get('description_action_count', 0)
     strategic_score = min((urgency_count + action_count) / 8, 1)
     score += strategic_score * 0.25
-
     # Professional sophistication (15% weight)
     prof_score = features.get('professional_sophistication_score', 0)
     score += prof_score * 0.15
-
     probability = min(score, 0.95)
     prediction = 1 if probability >= 0.5 else 0
-
     return probability, prediction, features
-
 # ============================================================================
 # FEEDBACK GENERATION
 # ============================================================================
-
 def generate_detailed_feedback(petition_data, features, probability, prediction):
     """Generate comprehensive feedback and recommendations"""
     
@@ -517,7 +453,6 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         'specific_recommendations': [],
         'metrics': {}
     }
-
     # Overall grade and styling
     if probability >= 0.8:
         feedback['grade'] = "🏆 EXCELLENT"
@@ -543,14 +478,12 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         feedback['grade'] = "🔧 MAJOR REVISION NEEDED"
         feedback['grade_class'] = "success-poor"
         feedback['overall'] = "Your petition requires major restructuring for success."
-
     # Analyze specific metrics
     content_score = features.get('content_comprehensiveness_score', 0)
     html_tags = features.get('description_html_tags', 0)
     urgency_count = features.get('title_urgency_count', 0) + features.get('description_urgency_count', 0)
     action_count = features.get('title_action_count', 0) + features.get('description_action_count', 0)
     prof_score = features.get('professional_sophistication_score', 0)
-
     # Content analysis
     if content_score >= 2000:
         feedback['strengths'].append("✅ Excellent content comprehensiveness")
@@ -561,7 +494,6 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         feedback['specific_recommendations'].append(
             f"Expand total content to 2000+ characters (current: {content_score:.0f})"
         )
-
     # HTML formatting
     if html_tags >= 15:
         feedback['strengths'].append("✅ Professional HTML formatting")
@@ -570,7 +502,6 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         feedback['specific_recommendations'].append(
             f"Add HTML formatting: <b>bold</b>, <strong>emphasis</strong>, <h3>headers</h3> (current: {html_tags} tags)"
         )
-
     # Strategic language
     if urgency_count >= 2:
         feedback['strengths'].append("✅ Strong urgency language")
@@ -578,14 +509,12 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         feedback['specific_recommendations'].append(
             "Add urgency keywords: 'immediate', 'urgent', 'critical', 'emergency'"
         )
-
     if action_count >= 3:
         feedback['strengths'].append("✅ Strong action-oriented language")
     else:
         feedback['specific_recommendations'].append(
             "Include more action words: 'demand', 'stop', 'implement', 'enforce'"
         )
-
     # Store metrics for display
     feedback['metrics'] = {
         'Content Length': f"{content_score:.0f} characters",
@@ -595,24 +524,20 @@ def generate_detailed_feedback(petition_data, features, probability, prediction)
         'Professional Score': f"{prof_score:.2f}",
         'Success Probability': f"{probability:.1%}"
     }
-
     return feedback
-
 # ============================================================================
 # STREAMLIT UI COMPONENTS
 # ============================================================================
-
 def display_header():
     """Display the main header"""
     st.markdown("""
     <div class="main-container">
-        <div class="main-header">🎯 AI-Powered Petition Success Predictor</div>
+        <div class="main-header">Petition Success Predictor</div>
         <div class="sub-header">
             Get instant feedback on your petition's success potential using advanced machine learning
         </div>
     </div>
     """, unsafe_allow_html=True)
-
 def display_results(feedback, features):
     """Display comprehensive analysis results"""
     
@@ -633,7 +558,6 @@ def display_results(feedback, features):
         </div>
     </div>
     """, unsafe_allow_html=True)
-
     # Metrics grid
     col1, col2, col3 = st.columns(3)
     metrics_items = list(feedback['metrics'].items())
@@ -647,7 +571,6 @@ def display_results(feedback, features):
                 <div style="font-size: 1.4rem; font-weight: bold; color: #1e293b;">{value}</div>
             </div>
             """, unsafe_allow_html=True)
-
     # Strengths
     if feedback['strengths']:
         st.markdown("### 🌟 Strengths")
@@ -660,7 +583,6 @@ def display_results(feedback, features):
                 {strength}
             </div>
             ''', unsafe_allow_html=True)
-
     # Improvements
     if feedback['improvements']:
         st.markdown("### 🔧 Areas for Improvement")
@@ -673,7 +595,6 @@ def display_results(feedback, features):
                 {improvement}
             </div>
             ''', unsafe_allow_html=True)
-
     # Specific recommendations
     if feedback['specific_recommendations']:
         st.markdown("### 📋 Specific Recommendations")
@@ -686,7 +607,6 @@ def display_results(feedback, features):
                 {i}. {rec}
             </div>
             ''', unsafe_allow_html=True)
-
     # Next steps
     st.markdown("### 🎯 Next Steps")
     next_steps = [
@@ -705,15 +625,12 @@ def display_results(feedback, features):
             {i}. {step}
         </div>
         ''', unsafe_allow_html=True)
-
 def create_sample_petition():
     """Return sample petition data"""
     return {
         'title': "Mandatory Installation of Oxygen Plants in All Hospitals Above 50 Beds to Save Lives During Medical Emergencies",
         'description': """<h3><strong>URGENT: Critical Oxygen Crisis in Indian Hospitals</strong></h3>
-
 <p>The <strong>COVID-19 pandemic</strong> has exposed a devastating gap in our healthcare infrastructure: <strong>over 85% of hospitals</strong> lack adequate oxygen generation facilities.</p>
-
 <h3><strong>The Problem:</strong></h3>
 <ul>
 <li><strong>Oxygen shortage</strong> affects 2,847 hospitals nationwide</li>
@@ -721,7 +638,6 @@ def create_sample_petition():
 <li><strong>Rural hospitals</strong> are disproportionately affected</li>
 <li><strong>Emergency patients</strong> face life-threatening delays</li>
 </ul>
-
 <h3><strong>Our Solution:</strong></h3>
 <p>We demand the <strong>Ministry of Health and Family Welfare</strong> implement immediate regulations requiring:</p>
 <ul>
@@ -730,25 +646,18 @@ def create_sample_petition():
 <li><strong>Regular audits</strong> and compliance monitoring</li>
 <li><strong>Financial assistance</strong> for rural and government hospitals</li>
 </ul>
-
 <p>This initiative will <strong>save over 50,000 lives annually</strong> and ensure that no patient dies due to oxygen shortage.</p>""",
         'letter_body': """Dear Honorable Minister of Health and Family Welfare,
-
 We urgently request your immediate intervention to address the critical oxygen shortage crisis in Indian hospitals that has claimed thousands of lives.
-
 As healthcare facilities nationwide struggle with inadequate oxygen infrastructure, patients continue to die from preventable causes. We demand mandatory installation of oxygen generation plants in all hospitals above 50 beds capacity.
-
 This life-saving measure requires immediate policy implementation with a 24-month compliance timeline, government financial support, and regular monitoring.
-
 We trust in your leadership to implement this critical healthcare reform that will save countless lives and strengthen our medical infrastructure.
-
 Sincerely,
 Concerned Citizens of India""",
         'targeting_description': "Ministry of Health and Family Welfare, Government of India; State Health Ministers; Hospital Administration Boards; Medical Council of India",
         'original_locale': 'en-IN',
         'has_location': True
     }
-
 def display_usage_tips():
     """Display usage tips and best practices"""
     with st.expander("📚 How to Use This Tool", expanded=False):
@@ -759,7 +668,6 @@ def display_usage_tips():
         3. **Be strategic:** Use urgency language, action words, and specific targets
         4. **Click "Analyze":** Get instant AI-powered predictions and recommendations
         5. **Iterate:** Improve based on feedback and re-analyze
-
         #### Tips for High Success Probability:
         - **Content Length:** Aim for 2000+ total characters across all fields
         - **HTML Formatting:** Use professional formatting with 15+ HTML tags
@@ -767,19 +675,15 @@ def display_usage_tips():
         - **Action Words:** Use "demand", "stop", "implement", "enforce"
         - **Authority Targeting:** Mention specific officials, departments, or institutions
         - **Statistics:** Include numbers, percentages, and data when possible
-
         #### Success Benchmarks:
-        - 🎯 **Target:** 70%+ success probability
         - 📝 **Content:** 2000+ total characters
         - 🎨 **Formatting:** 15+ HTML tags
         - ⚡ **Language:** 5+ urgency/action keywords
         - 🏛️ **Authority:** Specific targets mentioned
         """)
-
 # ============================================================================
 # MAIN APPLICATION
 # ============================================================================
-
 def main():
     """Main Streamlit application"""
     
@@ -802,30 +706,37 @@ def main():
     else:
         st.warning("⚠️ Model files not found. Running in demo mode with simplified analysis.")
         st.info("💡 To enable full functionality, upload your model files to the correct directories.")
-
     # Usage tips
     display_usage_tips()
     
+
     # Sample loader buttons outside the form
     st.markdown("## 🚀 Quick Start")
-    col1, col2, col3 = st.columns([1, 1, 2])
-    
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
+
     with col1:
-        if st.button("📝 Load Sample Petition", type="secondary"):
-            st.session_state.sample_data = create_sample_petition()
-            st.success("✅ Sample petition loaded!")
-            #st.balloons()
-    
+        if st.button("📘 Sample Petition 1"):
+            st.session_state.sample_data = {
+            'title': "Help Needed in Delhi Schools",
+            'description': "Please sign",
+            'letter_body': "to whom it may concern",
+            'targeting_description': "everyone",
+            'original_locale': 'en-IN',
+            'has_location': True
+        }
+            st.success("✅ Sample Petition 1 loaded!")
+
     with col2:
-        if st.button("🗑️ Clear All", type="secondary"):
-            st.session_state.sample_data = None
-            st.success("🗑️ Form cleared!")
-    
+        if st.button("📗 Sample Petition 2"):
+            st.session_state.sample_data = create_sample_petition()
+            st.success("✅ Sample Petition 2 loaded!")
+
     with col3:
         if st.session_state.sample_data:
-            st.info("📋 Sample data loaded! The form below is pre-filled.")
+            st.info("📋 Sample loaded! The form below is pre-filled.")
         else:
-            st.info("💡 Click 'Load Sample Petition' to see an example.")
+            st.info("💡 Load a sample petition to see an example.")
+
     
     # Create form
     st.markdown("## 📝 Petition Analysis Form")
@@ -953,7 +864,6 @@ def main():
             except Exception as e:
                 st.error(f"❌ Analysis error: {str(e)}")
                 st.error("Please check your inputs and try again.")
-
     # Footer
     st.markdown("---")
     st.markdown("""
@@ -962,6 +872,5 @@ def main():
         <p>💡 Tip: Aim for 70%+ success probability before launching your petition</p>
     </div>
     """, unsafe_allow_html=True)
-
 if __name__ == "__main__":
     main()

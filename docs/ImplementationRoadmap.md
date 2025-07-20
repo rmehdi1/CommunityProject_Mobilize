@@ -4,9 +4,9 @@
 
 This roadmap outlines a strategic transformation for MobilizeNow to enhance digital campaign messaging using data-driven insights. It is structured across three progressive phases:
 
-1. **Foundation and Proof of Concept**
-2. **Advanced Optimization and Platform Expansion**
-3. **Organizational Transformation and Integration**
+1. **Phase 1 (Months 1–3): Foundation and Proof of Concept**
+2. **Phase 2 (Months 4–9): Data Expansion and Advanced Optimization**
+3. **Phase 3 (Months 10–18): Integration and Organizational Transformation**
 
 ---
 

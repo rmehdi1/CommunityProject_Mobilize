@@ -15,7 +15,7 @@ This project aims to bridge the gap between intuition-based messaging and eviden
 ---
 
 ##  Repository Structure
-COMMUNITYPROJECT_MOBILIZE/
+~~~COMMUNITYPROJECT_MOBILIZE/
 ├── docs/
 │ ├── EDA_FeatureEngineering.md
 │ ├── ImplementationRoadmap.md
@@ -47,7 +47,7 @@ COMMUNITYPROJECT_MOBILIZE/
 │ ├── data_processing.py
 │ ├── feature_engineering.py
 │ ├── messaging_utils.py
-│ └── model_performance.py
+│ └── model_performance.py~~~
 
 ## 📊 Notebooks Overview
 

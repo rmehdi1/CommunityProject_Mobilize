@@ -251,51 +251,16 @@ def create_phase_detail(title, icon, description, activities):
             """, unsafe_allow_html=True)
 
 def display_full_roadmap():
-    """Display the full roadmap content from the markdown file"""
+    """Redirect user to the GitHub-hosted roadmap markdown file"""
 
-    # Stylized section header
     st.markdown("""
     <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
         <h2>📋 Implementation Roadmap for Messaging Optimization Framework</h2>
+        <p>View the complete roadmap on GitHub:</p>
+        <a href="https://github.com/rmehdi1/CommunityProject_Mobilize/blob/main/docs/ImplementationRoadmap.md" target="_blank" style="font-size: 1.1em; font-weight: bold; color: #1a73e8;">🔗 Open Roadmap on GitHub</a>
     </div>
     """, unsafe_allow_html=True)
 
-    # Path to the markdown file
-    roadmap_path = os.path.join("assets", "docs", "ImplementationRoadmap.md")
-
-    try:
-        with open(roadmap_path, 'r', encoding='utf-8') as file:
-            roadmap_content = file.read()
-
-        # Display content
-        with st.expander("📘 View Full Roadmap Content"):
-            st.markdown(roadmap_content, unsafe_allow_html=True)
-
-        # Download button
-        st.download_button(
-            label="📥 Download Roadmap (Markdown)",
-            data=roadmap_content,
-            file_name="ImplementationRoadmap.md",
-            mime="text/markdown",
-            use_container_width=True
-        )
-
-    except FileNotFoundError:
-        st.error("📄 Roadmap file not found. Please ensure 'assets/docs/ImplementationRoadmap.md' exists.")
-
-        # Fallback display
-        st.warning("Showing embedded roadmap overview instead:")
-        st.markdown("""
-        ## Overview  
-        This roadmap outlines a strategic transformation for MobilizeNow across three phases:
-        1. **Foundation and Proof of Concept**  
-        2. **Advanced Optimization and Platform Expansion**  
-        3. **Organizational Transformation and Integration**
-
-        _(For full details, please restore the markdown file to the correct path.)_
-        """)
-
-    # Link to related documentation
     st.markdown("---")
     st.subheader("🔗 Related Documentation")
 
@@ -306,6 +271,7 @@ def display_full_roadmap():
     with col2:
         if st.button("🏠 Back to Home", use_container_width=True):
             st.switch_page("streamlit_app.py")
+
 
 # CSS for better styling
 st.markdown("""

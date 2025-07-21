@@ -246,6 +246,7 @@ def show():
     # Call to action
     st.info("📖 **Want the full technical details?** Check out our [comprehensive EDA report](https://github.com/rmehdi1/CommunityProject_Mobilize/blob/main/docs/EDA_FeatureEngineering.md) for in-depth analysis, methodology, and statistical validation.")
     
+    
     st.success("✅ **Dataset Status**: Cleaned, processed, and ready for modeling with 3,081 unique campaigns and 73 engineered features optimized for messaging effectiveness analysis.")
 
 if __name__ == "__main__":

@@ -156,7 +156,7 @@ def model_performance_tab():
     Model Performance & Interpretation tab for MobilizeNow messaging optimization
     """
     
-    st.header("🎯 Model Performance & Interpretation")
+    st.header(" Model Performance & Interpretation")
     st.markdown("""
     This section helps you understand how our AI model performs and what drives petition success predictions.
     Based on analysis of **3,081 Change.org petitions** with **77% accuracy**.
@@ -166,7 +166,7 @@ def model_performance_tab():
     performance_metrics = get_actual_performance_metrics()
     
     # Performance Overview Section
-    st.subheader("📊 Model Performance Overview")
+    st.subheader(" Model Performance Overview")
     
     col1, col2, col3 = st.columns(3)
     
@@ -196,14 +196,14 @@ def model_performance_tab():
         st.markdown("**Consistent performance**")
     
     # What this means for your organization
-    st.markdown("### 🤔 What This Means for Your Organization")
+    st.markdown("###  What This Means for Your Organization")
     
     with st.expander("Understanding Model Performance", expanded=True):
         st.markdown(f"""
-        **🎯 Accuracy ({performance_metrics['accuracy']:.1%})**: Out of 100 petitions, our model correctly predicts the outcome for {performance_metrics['accuracy']*100:.0f} of them.
+        ** Accuracy ({performance_metrics['accuracy']:.1%})**: Out of 100 petitions, our model correctly predicts the outcome for {performance_metrics['accuracy']*100:.0f} of them.
         This is significantly better than random guessing (50%) and exceeds our target threshold (70%).
         
-        **🔍 What makes this reliable:**
+        ** What makes this reliable:**
         - Model was trained on 2,464 real Change.org petitions
         - Tested on completely separate data ({performance_metrics['test_samples']} petitions)
         - Performance is consistent across different petition types
@@ -216,7 +216,7 @@ def model_performance_tab():
         """)
     
     # Detailed Performance Breakdown
-    st.subheader("📈 Detailed Performance Analysis")
+    st.subheader(" Detailed Performance Analysis")
     
     # Create confusion matrix as DataFrame
     confusion_data = create_confusion_matrix_data(performance_metrics)
@@ -227,7 +227,7 @@ def model_performance_tab():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("#### 🎯 Predicting Successful Petitions")
+        st.markdown("####  Predicting Successful Petitions")
         st.markdown(f"""
         - **Precision**: {performance_metrics['precision_successful']:.0%} of petitions we predict as successful actually succeed
         - **Recall**: We identify {performance_metrics['recall_successful']:.0%} of all successful petitions
@@ -247,7 +247,7 @@ def model_performance_tab():
         st.success("✅ **Key strength**: Excellent at spotting petitions that need improvement before launch.")
     
     # Feature Importance Section
-    st.subheader("🔑 What Drives Petition Success?")
+    st.subheader(" What Drives Petition Success?")
     
     # Load actual feature importance data
     feature_importance_data = get_actual_feature_importance()
@@ -257,7 +257,7 @@ def model_performance_tab():
     st.plotly_chart(fig_importance, use_container_width=True)
     
     # Explain top features in business terms
-    st.markdown("### 💡 Key Success Factors Explained")
+    st.markdown("###  Key Success Factors Explained")
     
     tabs = st.tabs(["📝 Content Quality", "🎯 Strategic Language", "💼 Professional Presentation", "📊 Structure & Format"])
     
@@ -410,11 +410,11 @@ def model_performance_tab():
     with col1:
         st.markdown("""
         **What makes a petition "valuable"?**
-        - 🎯 Policy change achieved
-        - 📢 Media coverage generated  
-        - 👥 New members recruited
-        - 💪 Organizational credibility built
-        - 🔗 Coalition partnerships formed
+        -  Policy change achieved
+        -  Media coverage generated  
+        -  New members recruited
+        -  Organizational credibility built
+        -  Coalition partnerships formed
         """)
     
     with col2:

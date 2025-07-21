@@ -704,8 +704,8 @@ def main():
     if model_artifacts:
         st.success("✅ Model loaded successfully! Full analysis available.")
     else:
-        st.warning("⚠️ Model files not found. Running in demo mode with simplified analysis.")
-        st.info("💡 To enable full functionality, upload your model files to the correct directories.")
+        st.warning("⚠️ Demo Mode")
+        st.info("💡 Ensure Right Model usage.")
     # Usage tips
     display_usage_tips()
     

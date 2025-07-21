@@ -395,9 +395,15 @@ def show_messaging_insights():
 
     # 📘 Add Messaging Framework View
     with st.expander("📘 View Full Messaging Framework"):
-        md_path = os.path.join("assets", "docs", "MessagingFramework.md")
-        with open(md_path, "r", encoding="utf-8") as f:
-            st.markdown(f.read(), unsafe_allow_html=True)
+    st.markdown("""
+<div style="background: #f0f8ff; padding: 20px; border-radius: 10px;">
+    <p style="font-size: 1.1em;">The complete strategic messaging framework is available on GitHub:</p>
+    <a href="https://github.com/rmehdi1/CommunityProject_Mobilize/blob/main/docs/MessagingFramework.md" target="_blank" style="font-weight: bold; font-size: 1.05em; color: #1a73e8;">
+        🔗 Open MessagingFramework.md on GitHub
+    </a>
+</div>
+""", unsafe_allow_html=True)
+
 
     # Footer
     st.markdown("---")

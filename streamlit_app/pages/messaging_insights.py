@@ -11,15 +11,15 @@ def load_data():
     """Load processed data and model artifacts"""
     try:
         # Load processed data
-        data_path = os.path.join("data", "processed_petition_data.csv")
+        data_path = os.path.join("streamlit_app", "data", "processed_petition_data.csv")
         df = pd.read_csv(data_path)
         
         # Load model artifacts
-        model_path = os.path.join("models", "best_model.pkl")
+        model_path = os.path.join("streamlit_app", "models", "best_model.pkl")
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
             
-        features_path = os.path.join("models", "model_features.pkl")
+        features_path = os.path.join("streamlit_app", "models", "model_features.pkl")
         with open(features_path, 'rb') as f:
             feature_names = pickle.load(f)
             

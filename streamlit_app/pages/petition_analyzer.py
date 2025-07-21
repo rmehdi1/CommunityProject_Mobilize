@@ -374,16 +374,32 @@ class StreamlitPetitionPipeline:
 # MODEL LOADING FUNCTIONS
 # ============================================================================
 @st.cache_data
-@st.cache_data
 def load_model_artifacts():
     """Load all model artifacts with caching"""
     artifacts = {}
     try:
         # Get the directory where this script is located
         script_dir = os.path.dirname(os.path.abspath(__file__))
+        st.write(f"🔍 Script directory: {script_dir}")
+        st.write(f"🔍 Current working directory: {os.getcwd()}")
+        st.write(f"🔍 Files in script directory: {os.listdir(script_dir)}")
+        
+        # Check if models and data directories exist
+        models_dir = os.path.join(script_dir, 'models')
+        data_dir = os.path.join(script_dir, 'data')
+        
+        st.write(f"🔍 Models directory exists: {os.path.exists(models_dir)}")
+        st.write(f"🔍 Data directory exists: {os.path.exists(data_dir)}")
+        
+        if os.path.exists(models_dir):
+            st.write(f"🔍 Files in models directory: {os.listdir(models_dir)}")
+        if os.path.exists(data_dir):
+            st.write(f"🔍 Files in data directory: {os.listdir(data_dir)}")
         
         # Load trained model
         model_path = os.path.join(script_dir, 'models', 'best_model.pkl')
+        st.write(f"🔍 Looking for model at: {model_path}")
+        
         with open(model_path, 'rb') as f:
             artifacts['model'] = pickle.load(f)
         
@@ -409,13 +425,17 @@ def load_model_artifacts():
             except FileNotFoundError:
                 artifacts['reference_data'] = None
         
+        st.success("✅ All model artifacts loaded successfully!")
         return artifacts
+        
     except FileNotFoundError as e:
         st.error(f"Model files not found: {e}")
         return None
     except Exception as e:
         st.error(f"Error loading model artifacts: {e}")
         return None
+    
+    
 def predict_success(petition_data, model_artifacts, pipeline):
     """Predict petition success probability"""
     if not model_artifacts:

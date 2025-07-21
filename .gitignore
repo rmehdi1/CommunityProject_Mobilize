@@ -25,15 +25,24 @@ coverage.xml
 
 # Data files (if large)
 *.csv
-*.xlsx
+#*.xlsx
 *.json
 data/raw/
-!streamlit_app/data/sample_data.csv
+
+# BUT ALLOW these specific files:
+!data/inputdata.csv
+!data/processed_petition_data.csv
+!data/sample_data.csv
 
 # Model files (if large)
 streamlit_app/models/*.pkl
 streamlit_app/models/*.joblib
 !streamlit_app/models/.gitkeep
+
+# BUT ALLOW specific model files:
+!models/best_model.pkl
+!models/categorical_encoders.pkl
+!models/model_features.pkl
 
 # IDEs
 .vscode/

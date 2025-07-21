@@ -371,26 +371,47 @@ class StreamlitPetitionPipeline:
 # MODEL LOADING FUNCTIONS
 # ============================================================================
 @st.cache_data
+@st.cache_data
 def load_model_artifacts():
     """Load all model artifacts with caching"""
     artifacts = {}
     try:
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        
         # Load trained model
-        with open('models/best_model.pkl', 'rb') as f:
+        model_path = os.path.join(script_dir, 'models', 'best_model.pkl')
+        with open(model_path, 'rb') as f:
             artifacts['model'] = pickle.load(f)
+        
         # Load feature names
-        with open('models/model_features.pkl', 'rb') as f:
+        features_path = os.path.join(script_dir, 'models', 'model_features.pkl')
+        with open(features_path, 'rb') as f:
             artifacts['features'] = pickle.load(f)
+        
         # Load categorical encoders
-        with open('models/categorical_encoders.pkl', 'rb') as f:
+        encoders_path = os.path.join(script_dir, 'models', 'categorical_encoders.pkl')
+        with open(encoders_path, 'rb') as f:
             artifacts['encoders'] = pickle.load(f)
+        
         # Try to load reference data
         try:
-            artifacts['reference_data'] = pd.read_excel('data/processed_petition_data.xlsx')
+            data_path = os.path.join(script_dir, 'data', 'processed_petition_data.xlsx')
+            artifacts['reference_data'] = pd.read_excel(data_path)
         except FileNotFoundError:
-            artifacts['reference_data'] = None
+            # Try CSV as fallback
+            try:
+                data_path = os.path.join(script_dir, 'data', 'processed_petition_data.csv')
+                artifacts['reference_data'] = pd.read_csv(data_path)
+            except FileNotFoundError:
+                artifacts['reference_data'] = None
+        
         return artifacts
     except FileNotFoundError as e:
+        st.error(f"Model files not found: {e}")
+        return None
+    except Exception as e:
+        st.error(f"Error loading model artifacts: {e}")
         return None
 def predict_success(petition_data, model_artifacts, pipeline):
     """Predict petition success probability"""
